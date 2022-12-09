@@ -1,0 +1,3 @@
+/media/minh253/D/c++project/yolov5_cpp/CMakeFiles/yolov5_cpp.dir
+/media/minh253/D/c++project/yolov5_cpp/CMakeFiles/edit_cache.dir
+/media/minh253/D/c++project/yolov5_cpp/CMakeFiles/rebuild_cache.dir
