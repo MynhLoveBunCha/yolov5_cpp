@@ -6,6 +6,7 @@ using namespace std;
 using namespace cv;
 
 
+// set global params
 const vector<Scalar> colors = {Scalar(255, 255, 0), Scalar(0, 255, 0), Scalar(0, 255, 255), Scalar(255, 0, 0)};
 const float INPUT_WIDTH = 640.0;
 const float INPUT_HEIGHT = 640.0;
@@ -115,7 +116,7 @@ int main(){
     // init webcam capture //
     Mat frame;
     VideoCapture cap;
-    int camID = 2;
+    int camID = 2;  // your cam ID might be 0, 1 or 2
     int defaultID = CAP_ANY;
     cap.open(camID, defaultID);
     if(!cap.isOpened()){
@@ -125,10 +126,16 @@ int main(){
 
     // load model //
     auto net = dnn::readNet("yolov5s.onnx");
+
+    // Comment the following 3 lines if you do not build opencv with CUDA backend
+    // ---------------------------
     cout << "Attempt to use CUDA\n";
     net.setPreferableBackend(dnn::DNN_BACKEND_CUDA);
     net.setPreferableTarget(dnn::DNN_TARGET_CUDA);
+    // ---------------------------
 
+
+    // Get list of class name
     vector<string> class_list = load_class_list();
 
 
@@ -140,10 +147,15 @@ int main(){
             break;
         }
         auto start = chrono::high_resolution_clock::now();
+
+
+        // Inference 
         vector<Detection> output;
         detect(frame, net, output, class_list);
         int n_detections = output.size();
 
+
+        // Draw bounding box
         for (int i = 0; i < n_detections; ++i)
         {
 
@@ -160,6 +172,8 @@ int main(){
         }
         auto end = chrono::high_resolution_clock::now();
 
+
+        // FPS calculation
         float fps = 1 * 1000.0 / chrono::duration_cast<chrono::milliseconds>(end - start).count();
         ostringstream fps_label;
         fps_label << fixed << setprecision(2);
@@ -167,7 +181,13 @@ int main(){
         string fps_label_str = fps_label.str();
 
         cv::putText(frame, fps_label_str.c_str(), cv::Point(10, 25), cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(0, 255, 255), 2);
+
+
+        // display
         imshow("webcam", frame);
+
+
+        // Exit condition
         if(waitKey(15) >= 0){
             break;
         }
